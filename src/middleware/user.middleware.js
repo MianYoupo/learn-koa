@@ -15,7 +15,6 @@ const userValidator = async (ctx, next) => {
 }
 
 const verifyUser = async (ctx, next) => {
-  console.log(ctx)
   const { user_name } = ctx.request.body
 
   //合理性

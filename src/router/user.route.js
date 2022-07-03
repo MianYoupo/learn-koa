@@ -6,7 +6,7 @@ const { register, login } = require('../controller/user.controller')
 const router = new Router({ prefix: '/users' })
 
 //注册接口
-router.post('/users', userValidator, verifyUser, register)
+router.post('/register', userValidator, verifyUser, register)
 
 //登录接口
 router.post('/login', login)
