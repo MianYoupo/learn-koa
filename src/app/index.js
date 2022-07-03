@@ -7,4 +7,10 @@ app.use(KoaBody());
 const userRouter = require("../router/user.route");
 app.use(userRouter.routes());
 
+//统一错误处理
+const errHandler = require('./errHandler')
+app.on('error', (err, ctx) => { 
+  
+ })
+
 module.exprts = app;
