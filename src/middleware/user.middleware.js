@@ -1,5 +1,7 @@
+const bcrypt = require('bcryptjs')
+
 const { getUserInfo } = require('../service/user.service')
-const { userFormateError, userAlreadyExited } = require('../consitant/err.type')
+const { userFormateError, userAlreadyExited, userRegisterError } = require('../constant/err.type')
 
 const userValidator = async (ctx, next) => {
   const { user_name, password } = ctx.request.body
@@ -17,11 +19,30 @@ const userValidator = async (ctx, next) => {
 const verifyUser = async (ctx, next) => {
   const { user_name } = ctx.request.body
 
-  //合理性
-  if (await getUserInfo({ user_name })) {
-    ctx.app.emit('error', userAlreadyExited, ctx)
+  try {
+    const res = await getUserInfo({ user_name })
+    if (res) {
+      console.error('用户名已经存在', { user_name })
+      ctx.app.emit('error', userAlreadyExited, ctx)
+      return
+    }
+  } catch (error) {
+    console.error('获取用户信息错误', error)
+    ctx.app.emit('error', userRegisterError, ctx)
     return
   }
+
+  await next()
+}
+
+const cryptPassword = async (ctx, next) => {
+  const { password } = ctx.request.body
+
+  const salt = bcrypt.genSaltSync(10)
+  //hash 保存的是 密文
+  const hash = bcrypt.hashSync(password, salt)
+
+  ctx.request.body.password = hash
 
   await next()
 }
@@ -29,4 +50,5 @@ const verifyUser = async (ctx, next) => {
 module.exports = {
   userValidator,
   verifyUser,
+  cryptPassword,
 }
